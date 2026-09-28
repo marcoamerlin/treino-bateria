@@ -246,6 +246,7 @@ header.faceplate::before {
   -webkit-overflow-scrolling: touch;
 }
 .tab-readout pre { margin: 0; font-family: var(--font-mono); font-size: 12px; line-height: 1.55; color: var(--lcd-text); white-space: pre; }
+.tab-readout pre .accent { color: var(--text); font-weight: 600; }
 .legend { margin: 7px 0 0; font-size: 11.5px; color: var(--text-faint); line-height: 1.5; }
 .legend code { font-family: var(--font-mono); color: var(--lcd-text); }
 

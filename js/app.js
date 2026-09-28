@@ -3,7 +3,7 @@
 
 import { WEEK } from './data/plans.js';
 import { RUDIMENTS, CATEGORIES } from './data/rudiments.js';
-import { buildSticking } from './sticking.js';
+import { buildStickingHTML } from './sticking.js';
 import { metronome } from './metronome.js';
 import { rudimentPlayer } from './rudiment-player.js';
 import { practiceTimer } from './practice-timer.js';
@@ -891,7 +891,7 @@ function exerciseBody(id, ex, item, tkey, canRun) {
     body.appendChild(head);
     const readout = el('div', 'tab-readout');
     const pre = el('pre');
-    pre.textContent = buildSticking(ex.hits);
+    pre.innerHTML = buildStickingHTML(ex.hits);
     readout.appendChild(pre);
     body.appendChild(readout);
     body.appendChild(el('p', 'legend',
