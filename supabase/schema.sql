@@ -1,0 +1,152 @@
+-- Treino de Bateria: banco no Supabase.
+-- Cole este arquivo inteiro no SQL Editor do MESMO projeto Supabase do Treino de Guitarra e
+-- clique em Run. É aditivo e idempotente: só cria tabelas com prefixo "drum_" (não toca em
+-- user_data/teacher_codes/teacher_links da guitarra) e pode ser colado de novo sem problema.
+--
+-- Uma linha por usuário guarda todos os dados do treino (jsonb). A coluna rev serve para o
+-- controle otimista: um aparelho só grava se ninguém gravou antes (ver js/sync-core.js).
+
+create table if not exists public.drum_user_data (
+  user_id    uuid primary key references auth.users (id) on delete cascade,
+  data       jsonb       not null default '{}'::jsonb,
+  rev        bigint      not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+-- Segurança por linha: cada usuário só enxerga e altera a própria linha.
+alter table public.drum_user_data enable row level security;
+
+-- Permissões da API. Ao criar o projeto, "Automatically expose new tables" deve ficar DESMARCADO
+-- (nenhuma tabela nova nasce acessível). Aqui liberamos só o necessário, só para quem está logado.
+-- Funciona igual se a opção tiver ficado marcada: o revoke tira o acesso do papel anônimo.
+revoke all on public.drum_user_data from anon;
+grant usage on schema public to authenticated;
+grant select, insert, update on public.drum_user_data to authenticated;
+
+drop policy if exists "drum_user_data_select_own" on public.drum_user_data;
+drop policy if exists "drum_user_data_insert_own" on public.drum_user_data;
+drop policy if exists "drum_user_data_update_own" on public.drum_user_data;
+
+create policy "drum_user_data_select_own" on public.drum_user_data
+  for select to authenticated using ((select auth.uid()) = user_id);
+
+create policy "drum_user_data_insert_own" on public.drum_user_data
+  for insert to authenticated with check ((select auth.uid()) = user_id);
+
+create policy "drum_user_data_update_own" on public.drum_user_data
+  for update to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+-- Sem policy de delete: ninguém apaga a linha pelo app.
+
+-- ---------------------------------------------------------------------------------------------
+-- Professor/aluno: um professor acompanha e edita o plano de alunos vinculados a ele.
+-- O vínculo nasce do lado do ALUNO (ele digita o código do professor) — autosserviço, sem o
+-- professor precisar saber o e-mail/id do aluno de antemão. Continua exigindo que a conta do
+-- aluno já exista (criada à mão no painel, já que o cadastro público está desligado).
+--
+-- Tabelas separadas (drum_teacher_codes/drum_teacher_links) das da guitarra: um professor pode
+-- dar aula de guitarra E bateria pra alunos diferentes, e os vínculos de um instrumento não devem
+-- aparecer no outro.
+-- ---------------------------------------------------------------------------------------------
+
+-- Um código por professor (ele mesmo cria/gera o próprio código, ver js/teacher-core.js).
+create table if not exists public.drum_teacher_codes (
+  teacher_id    uuid primary key references auth.users (id) on delete cascade,
+  code          text        not null unique,
+  teacher_email text        not null,
+  created_at    timestamptz not null default now()
+);
+
+-- O vínculo em si. student_id é chave primária: um aluno tem no máximo 1 professor de bateria por
+-- vez (vincular de novo troca o professor). teacher_email/student_email ficam copiados aqui na
+-- hora do vínculo só para exibir nome na tela sem precisar de acesso a auth.users (que o RLS não
+-- libera).
+create table if not exists public.drum_teacher_links (
+  student_id    uuid primary key references auth.users (id) on delete cascade,
+  teacher_id    uuid        not null references auth.users (id) on delete cascade,
+  student_email text        not null,
+  teacher_email text        not null,
+  created_at    timestamptz not null default now()
+);
+
+alter table public.drum_teacher_codes enable row level security;
+alter table public.drum_teacher_links enable row level security;
+
+revoke all on public.drum_teacher_codes from anon;
+revoke all on public.drum_teacher_links from anon;
+grant select, insert, update on public.drum_teacher_codes to authenticated;
+-- update também é preciso aqui: o "Vincular" faz um upsert, que por baixo é um insert com
+-- "on conflict do update" (vincular de novo troca de professor) — sem o grant, dava
+-- "permission denied for table drum_teacher_links" (mesmo achado da guitarra, 2026-09-28).
+grant select, insert, update, delete on public.drum_teacher_links to authenticated;
+
+drop policy if exists "drum_teacher_codes_select_any" on public.drum_teacher_codes;
+drop policy if exists "drum_teacher_codes_upsert_own" on public.drum_teacher_codes;
+drop policy if exists "drum_teacher_codes_update_own" on public.drum_teacher_codes;
+
+-- Qualquer pessoa logada pode "resolver" um código (precisa disso para o aluno achar o
+-- teacher_id a partir do código); o código sozinho não dá acesso a dado nenhum.
+create policy "drum_teacher_codes_select_any" on public.drum_teacher_codes
+  for select to authenticated using (true);
+
+create policy "drum_teacher_codes_upsert_own" on public.drum_teacher_codes
+  for insert to authenticated with check ((select auth.uid()) = teacher_id);
+
+create policy "drum_teacher_codes_update_own" on public.drum_teacher_codes
+  for update to authenticated
+  using ((select auth.uid()) = teacher_id)
+  with check ((select auth.uid()) = teacher_id);
+
+drop policy if exists "drum_teacher_links_select_related" on public.drum_teacher_links;
+drop policy if exists "drum_teacher_links_insert_self" on public.drum_teacher_links;
+drop policy if exists "drum_teacher_links_update_self" on public.drum_teacher_links;
+drop policy if exists "drum_teacher_links_delete_related" on public.drum_teacher_links;
+
+-- Professor e aluno enxergam o próprio vínculo (o professor vê todos os alunos dele).
+create policy "drum_teacher_links_select_related" on public.drum_teacher_links
+  for select to authenticated
+  using ((select auth.uid()) = teacher_id or (select auth.uid()) = student_id);
+
+-- Só o próprio aluno cria o vínculo (linka a si mesmo a um professor).
+create policy "drum_teacher_links_insert_self" on public.drum_teacher_links
+  for insert to authenticated with check ((select auth.uid()) = student_id);
+
+-- Idem para atualizar (o "Vincular" é um upsert: se o aluno já tinha vínculo, isto troca de
+-- professor em vez de inserir de novo).
+create policy "drum_teacher_links_update_self" on public.drum_teacher_links
+  for update to authenticated
+  using ((select auth.uid()) = student_id)
+  with check ((select auth.uid()) = student_id);
+
+-- Qualquer um dos dois lados pode desfazer o vínculo.
+create policy "drum_teacher_links_delete_related" on public.drum_teacher_links
+  for delete to authenticated
+  using ((select auth.uid()) = teacher_id or (select auth.uid()) = student_id);
+
+-- Estende o acesso a drum_user_data: um professor também lê e grava a linha dos alunos
+-- vinculados a ele. Confiança do tamanho do grupo (poucos professores conhecidos): a policy
+-- libera a LINHA inteira, não só o campo "plans" — o app (js/teacher.js) só edita plans/speeds,
+-- nunca logs, mas pelo banco um professor mal-intencionado tecnicamente poderia. Reavaliar se o
+-- app crescer além de professores de confiança pessoal do dono do projeto.
+drop policy if exists "drum_user_data_select_teacher" on public.drum_user_data;
+drop policy if exists "drum_user_data_update_teacher" on public.drum_user_data;
+
+create policy "drum_user_data_select_teacher" on public.drum_user_data
+  for select to authenticated
+  using (exists (
+    select 1 from public.drum_teacher_links tl
+    where tl.student_id = drum_user_data.user_id and tl.teacher_id = (select auth.uid())
+  ));
+
+create policy "drum_user_data_update_teacher" on public.drum_user_data
+  for update to authenticated
+  using (exists (
+    select 1 from public.drum_teacher_links tl
+    where tl.student_id = drum_user_data.user_id and tl.teacher_id = (select auth.uid())
+  ))
+  with check (exists (
+    select 1 from public.drum_teacher_links tl
+    where tl.student_id = drum_user_data.user_id and tl.teacher_id = (select auth.uid())
+  ));

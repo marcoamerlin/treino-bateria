@@ -1,0 +1,13 @@
+{
+  "name": "treino-bateria",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/merge.test.mjs tests/sync.test.mjs tests/teacher.test.mjs tests/practice-timer.test.mjs tests/audio-context.test.mjs tests/voice-command.test.mjs tests/sticking-dsl.test.mjs tests/rudiments.test.mjs"
+  },
+  "devDependencies": {
+    "soundfont2": "^0.5.0",
+    "lamejs": "^1.2.1"
+  }
+}
