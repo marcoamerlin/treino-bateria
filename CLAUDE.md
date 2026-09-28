@@ -101,8 +101,19 @@ Pendências.
   `tabPlayer`→`rudimentPlayer`. **Sem** o explorador de escalas/acordes/intervalos da guitarra
   ("Braço") — não fazia sentido pra bateria, não foi pedido. `listenButtons`/`exerciseBody` foram
   reescritos: em vez do sistema de múltiplas abas de tablatura + acordes da guitarra, cada
-  rudimento tem 1 só `hits`/`spec`, mostrado como um único bloco de `buildSticking()` com uma
-  legenda (R/L, graça, acento, buzz).
+  rudimento tem 1 só `hits`/`spec`, mostrado como um único bloco de `buildStickingHTML()` (pedido
+  do usuário, 2026-09-28: destacar a nota acentuada — a letra R/L vem em negrito com a cor de
+  maior contraste do painel, além do `>` de sempre, já que vermelho/verde já significam
+  erro/ativo em outro lugar do app) com uma legenda (R/L, graça, acento, buzz).
+- `sw.js`: cache offline. Achado real testando um deploy (2026-09-28): o GitHub Pages manda
+  `Cache-Control: max-age=600` nos arquivos do app, então um `fetch(request)` comum dentro do
+  service worker podia devolver uma cópia de até 10 min atrás mesmo pedindo "rede primeiro" —
+  atualizações pareciam não chegar nos aparelhos dos usuários. Corrigido criando o request de novo
+  com `{ cache: 'reload' }` (ignora o cache HTTP, vai sempre ao servidor) e registrando o worker
+  com `{ updateViaCache: 'none' }` em `app.js` (senão o `sw.js` em si também podia ficar preso no
+  cache por até 10 min, atrasando o navegador notar que existe versão nova). Mesmo assim, **subir
+  o número de `CACHE`** a cada deploy que muda algum arquivo do `SHELL` continua necessário — é o
+  que faz o service worker antigo ser substituído e o cache velho, apagado (`activate`).
 
 ## Som
 

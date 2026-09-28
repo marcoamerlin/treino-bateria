@@ -2,7 +2,7 @@
 // Arquivos do app: rede primeiro (pega atualizações), cache como reserva.
 // Fontes do Google: cache na primeira visita, para aparecerem offline depois.
 
-const CACHE = 'bateria-v1';
+const CACHE = 'bateria-v2';
 const SHELL = [
   './',
   'index.html',
@@ -60,8 +60,14 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (url.origin === self.location.origin) {
+    // GitHub Pages manda Cache-Control: max-age=600 nos arquivos do app — um fetch(request) comum
+    // pode devolver uma cópia de até 10 min atrás direto do cache HTTP do navegador, mesmo aqui
+    // pedindo "rede primeiro". 'reload' força ignorar esse cache e ir sempre ao servidor de
+    // verdade (achado testando: sem isso, atualizações não chegavam nos aparelhos dos usuários
+    // dentro dessa janela de 10 min, mesmo com o deploy já no ar).
+    const fresh = new Request(request, { cache: 'reload' });
     event.respondWith(
-      fetch(request)
+      fetch(fresh)
         .then((response) => {
           const copy = response.clone();
           caches.open(CACHE).then((cache) => cache.put(request, copy));
