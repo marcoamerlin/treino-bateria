@@ -37,6 +37,12 @@ O que é específico de bateria está listado depois.
   a ele — mesmíssima lógica da guitarra (vínculo nasce do aluno digitando um código, controle
   otimista por `rev` em `writeStudentPlan`/`writeStudentSpeed`, histórico via foto do plano). Só
   os nomes de tabela mudam (`drum_` no lugar do que a guitarra usa) — ver abaixo.
+  Todo item que o professor salva vira `locked: true` (pedido de usuário, 2026-09-29): o aluno
+  pode reordenar e ajustar tempo/BPM de um exercício travado, mas não remover nem trocar — só os
+  que ele mesmo adicionar depois (sem essa marca) ficam livres. `exerciseCard()` em app.js esconde
+  os botões Trocar/Remover nesse caso (mostra "🎓 Definido pelo professor" no lugar) e o botão
+  "Restaurar plano padrão" fica desabilitado se o dia tiver algum item travado — senão seria uma
+  forma disfarçada de apagar o que o professor montou.
 - `js/audio-context.js`: AudioContext resistente a travas (Android prende o canal de áudio numa
   troca de saída ou após tempo em segundo plano). Instrumento-agnóstico, cópia exata.
 - `js/metronome.js`: metrônomo Web Audio com agendamento antecipado. Cópia exata.
