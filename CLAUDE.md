@@ -52,6 +52,10 @@ O que é específico de bateria está listado depois.
   a subdivisão com o metrônomo tocando só vale a partir do próximo tempo (senão o tempo em curso
   misturaria duas subdivisões). Preferência `metroSubdiv`; a antiga `metroSub: true` vira 2.
   Testes em `tests/metronome.test.mjs`.
+  A mesma fileira aparece no quadro de velocidade de cada exercício (`speedBox` em app.js): cada
+  exercício guarda a sua (`prefs.exSubdiv[id]`, padrão 1; só deste aparelho, o professor não mexe)
+  e "Tocar metrônomo" do exercício aplica BPM + subdivisão dele — como o BPM, isso também muda o
+  que o metrônomo livre mostra até ele ser ajustado de novo.
 - `js/voice-command.js`: comando de voz pra marcar Limpo/Errei sem largar as baquetas. Cópia
   exata — "limpo"/"errei" servem igual pra bateria.
 - `js/practice-timer.js`: cronômetro por exercício. Chave própria (`drumPracticeTimer_v1`), lógica

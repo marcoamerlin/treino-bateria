@@ -108,6 +108,25 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet
 
 // ---- Metrônomo ---------------------------------------------------------------
 
+// Fileira de subdivisão (cliques por tempo), usada no metrônomo livre e em cada exercício.
+const subdivRowHTML = () =>
+  '<div class="label-row"><span>SUBDIVISÃO</span><span class="subdiv-name"></span></div>' +
+  '<div class="seg-row">' +
+    SUBDIVISIONS.map((s) => `<button class="seg" data-subdiv="${s.n}" aria-label="${s.name}">${s.n}</button>`).join('') +
+  '</div>';
+const subdivName = (n) => SUBDIVISIONS.find((s) => s.n === n).name;
+// `short`: só o nome (o quadro do exercício é mais estreito que a folha do metrônomo).
+function showSubdiv(root, n, short = false) {
+  root.querySelectorAll('[data-subdiv]').forEach((b) => b.classList.toggle('on', Number(b.dataset.subdiv) === n));
+  root.querySelector('.subdiv-name').textContent = short ? subdivName(n).toUpperCase()
+    : `${subdivName(n).toUpperCase()} · ${n} ${n === 1 ? 'CLIQUE' : 'CLIQUES'} POR TEMPO`;
+}
+
+// Subdivisão de cada exercício: preferência deste aparelho (não sincroniza, o professor não mexe),
+// guardada por id em prefs.exSubdiv. Sem escolha, o exercício toca 1 clique por tempo.
+const exerciseSubdiv = (id) => normalizeSubdivision(store.getPref('exSubdiv', {})[id] ?? 1);
+const setExerciseSubdiv = (id, n) => store.setPref('exSubdiv', { ...store.getPref('exSubdiv', {}), [id]: n });
+
 function metronomeView() {
   const root = el('div');
   root.innerHTML =
@@ -124,10 +143,7 @@ function metronomeView() {
     '<div class="seg-row">' +
       [2, 3, 4, 6].map((n) => `<button class="seg" data-beats="${n}">${n}</button>`).join('') +
     '</div>' +
-    '<div class="label-row"><span>SUBDIVISÃO</span><span class="subdiv-name"></span></div>' +
-    '<div class="seg-row">' +
-      SUBDIVISIONS.map((s) => `<button class="seg" data-subdiv="${s.n}" aria-label="${s.name}">${s.n}</button>`).join('') +
-    '</div>' +
+    subdivRowHTML() +
     '<button class="metro-btn big" data-toggle><span class="beat-led"></span><span class="label"></span></button>';
 
   const range = root.querySelector('.bpm-range');
@@ -135,10 +151,7 @@ function metronomeView() {
     root.querySelector('.num').textContent = metronome.bpm;
     range.value = metronome.bpm;
     root.querySelectorAll('[data-beats]').forEach((b) => b.classList.toggle('on', Number(b.dataset.beats) === metronome.beats));
-    root.querySelectorAll('[data-subdiv]').forEach((b) => b.classList.toggle('on', Number(b.dataset.subdiv) === metronome.subdivision));
-    const sub = SUBDIVISIONS.find((s) => s.n === metronome.subdivision);
-    root.querySelector('.subdiv-name').textContent =
-      `${sub.name.toUpperCase()} · ${sub.n} ${sub.n === 1 ? 'CLIQUE' : 'CLIQUES'} POR TEMPO`;
+    showSubdiv(root, metronome.subdivision);
     const button = root.querySelector('[data-toggle]');
     button.classList.toggle('on', metronome.running);
     button.querySelector('.label').textContent = metronome.running ? 'Parar' : 'Iniciar';
@@ -731,6 +744,7 @@ function speedBox(id, ex) {
       '<button class="run-btn ok" data-run="ok">✓ Limpo <small></small></button>' +
       '<button class="run-btn bad" data-run="bad">✗ Errei <small></small></button>' +
     '</div>' +
+    '<div class="ex-subdiv">' + subdivRowHTML() + '</div>' +
     '<button class="metro-btn" data-metro><span class="beat-led"></span><span class="label"></span></button>' +
     (voiceSupported
       ? '<button class="metro-btn voice-btn" data-voice><span class="mic-dot"></span><span class="label"></span></button>' +
@@ -754,6 +768,7 @@ function speedBox(id, ex) {
     box.querySelector('.ok small').textContent = `${speed.clean}/3`;
     box.querySelector('.bad small').textContent = `${speed.errors}/2`;
     box.querySelector('[data-metro]').classList.toggle('on', metronome.running);
+    showSubdiv(box, exerciseSubdiv(id), true);
     box.querySelector('[data-metro] .label').textContent = metronome.running ? 'Parar metrônomo' : `Tocar metrônomo a ${speed.bpm} BPM`;
 
     const voiceBtn = box.querySelector('[data-voice]');
@@ -803,9 +818,17 @@ function speedBox(id, ex) {
     } else if (btn.dataset.run) {
       run(btn.dataset.run === 'ok');
       return;
+    } else if (btn.dataset.subdiv) {
+      setExerciseSubdiv(id, Number(btn.dataset.subdiv));
+      if (metronome.running) metronome.setSubdivision(exerciseSubdiv(id));
     } else if ('metro' in btn.dataset) {
       if (metronome.running) metronome.stop();
-      else { rudimentPlayer.stop(); metronome.setBpm(store.getSpeed(id, cfg).bpm); metronome.start(); }
+      else {
+        rudimentPlayer.stop();
+        metronome.setBpm(store.getSpeed(id, cfg).bpm);
+        metronome.setSubdivision(exerciseSubdiv(id));
+        metronome.start();
+      }
     } else if ('voice' in btn.dataset) {
       voiceCommand.toggle(id, (cmd) => run(cmd === 'ok'));
     }
