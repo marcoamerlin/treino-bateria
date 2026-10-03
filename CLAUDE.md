@@ -11,7 +11,7 @@ bateria. Estética de painel de amplificador (fundo escuro, LCD âmbar, switches
 ```
 npm start      # node tools/serve.mjs → http://localhost:5174 (porta diferente da guitarra, 5173,
                # pra dar pra rodar os dois ao mesmo tempo)
-npm test       # testes de merge, sync, professor/aluno, sticking-dsl e banco de rudimentos (Node, sem dependências)
+npm test       # testes de merge, sync, professor/aluno, metrônomo, sticking-dsl e banco de rudimentos (Node, sem dependências)
 ```
 
 Regenerar ícones: `powershell -File tools/make-icons.ps1`.
@@ -45,7 +45,13 @@ O que é específico de bateria está listado depois.
   forma disfarçada de apagar o que o professor montou.
 - `js/audio-context.js`: AudioContext resistente a travas (Android prende o canal de áudio numa
   troca de saída ou após tempo em segundo plano). Instrumento-agnóstico, cópia exata.
-- `js/metronome.js`: metrônomo Web Audio com agendamento antecipado. Cópia exata.
+- `js/metronome.js`: metrônomo Web Audio com agendamento antecipado. Portado da guitarra, com UMA
+  diferença (pedido do usuário, 2026-10-03): a subdivisão deixou de ser o liga/desliga de colcheias
+  (`subdivide`) e virou `subdivision` = cliques por tempo, escolhido numa fileira "SUBDIVISÃO" na
+  tela (`SUBDIVISIONS`: 1 semínimas, 2 colcheias, 3 tercinas, 4 semicolcheias, 6 sextinas). Trocar
+  a subdivisão com o metrônomo tocando só vale a partir do próximo tempo (senão o tempo em curso
+  misturaria duas subdivisões). Preferência `metroSubdiv`; a antiga `metroSub: true` vira 2.
+  Testes em `tests/metronome.test.mjs`.
 - `js/voice-command.js`: comando de voz pra marcar Limpo/Errei sem largar as baquetas. Cópia
   exata — "limpo"/"errei" servem igual pra bateria.
 - `js/practice-timer.js`: cronômetro por exercício. Chave própria (`drumPracticeTimer_v1`), lógica
@@ -177,8 +183,6 @@ lógica foi só portada):
   `drum_user_data`, `drum_teacher_codes`, `drum_teacher_links`) precisa ser colado no SQL Editor
   do projeto Supabase (o mesmo da guitarra) antes de testar sincronização/professor de verdade.
   É aditivo/idempotente, não mexe nos dados da guitarra.
-- Publicar no GitHub Pages (repositório `marcoamerlin/treino-bateria`, ver `docs/setup.md`) —
-  `git init`/commit inicial/push ainda não feitos.
 - Validar os 40 rudimentos tocando de verdade (as fontes foram cruzadas com cuidado, mas nenhuma
   foi confirmada ao vivo por um baterista, diferente de boa parte do conteúdo da guitarra que foi
   ditado/conferido pelo usuário assistindo vídeo). Ajustar BPM inicial/meta de cada um conforme a
