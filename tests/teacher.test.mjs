@@ -138,6 +138,18 @@ test('writeStudentPlan: cria a linha do aluno se ele nunca sincronizou, marcando
   assert.deepEqual(db.drum_user_data[0].data.plans.seg.items, [{ ex: 'single_stroke_roll', min: 10, locked: true }]);
 });
 
+test('writeStudentPlan: guarda a observação do professor aparada e descarta a vazia', async () => {
+  const { client, db } = makeServer();
+  await writeStudentPlan(client, 's1', 'seg', [
+    { ex: 'single_stroke_roll', min: 10, note: '  Foque na mão esquerda  ' },
+    { ex: 'six_stroke_roll', min: 8, note: '   ' },
+  ]);
+  assert.deepEqual(db.drum_user_data[0].data.plans.seg.items, [
+    { ex: 'single_stroke_roll', min: 10, note: 'Foque na mão esquerda', locked: true },
+    { ex: 'six_stroke_roll', min: 8, locked: true },
+  ]);
+});
+
 test('writeStudentPlan: troca só o dia editado, sem mexer em logs/speeds nem noutros dias', async () => {
   const { client, db } = makeServer();
   db.drum_user_data.push({

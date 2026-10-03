@@ -43,6 +43,12 @@ O que é específico de bateria está listado depois.
   os botões Trocar/Remover nesse caso (mostra "🎓 Definido pelo professor" no lugar) e o botão
   "Restaurar plano padrão" fica desabilitado se o dia tiver algum item travado — senão seria uma
   forma disfarçada de apagar o que o professor montou.
+  O professor também pode escrever uma observação por exercício pra aquele aluno (pedido do
+  usuário, 2026-10-03): campo de texto em cada item de "Planejar a semana", gravado como
+  `item.note` junto com o plano do dia (`writeStudentPlan` apara e descarta a vazia, máx. 500
+  caracteres). O aluno vê "📝 observação" na linha do cartão e, ao abrir o exercício, um quadro
+  "OBSERVAÇÃO DO PROFESSOR" no topo. Só o professor escreve; editar tempo/ordem no aparelho do
+  aluno preserva a nota. A foto do plano (`log.plan`) continua só com `ex`/`min`.
 - `js/audio-context.js`: AudioContext resistente a travas (Android prende o canal de áudio numa
   troca de saída ou após tempo em segundo plano). Instrumento-agnóstico, cópia exata.
 - `js/metronome.js`: metrônomo Web Audio com agendamento antecipado. Portado da guitarra, com UMA
