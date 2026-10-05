@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { metronome, SUBDIVISIONS, normalizeSubdivision } from '../js/metronome.js';
+import { metronome, SUBDIVISIONS, BEATS_PER_BAR, normalizeSubdivision } from '../js/metronome.js';
 
 // Roda o agendador com um relógio de áudio falso e devolve os cliques agendados até `seconds`,
 // como letras: A = tempo 1 acentuado, B = outro tempo, s = subdivisão. Troca de subdivisão no
@@ -53,4 +53,17 @@ test('trocar a subdivisão no meio de um tempo só vale a partir do tempo seguin
   const clicks = clicksFor({ subdivision: 2, seconds: 3, changes: [{ at: 0.3, n: 3 }] });
   assert.equal(pattern(clicks), 'AsBssBss');
   assert.ok(clicks.filter((c) => c.ch !== 's').every((c) => Math.abs(c.time - Math.round(c.time)) < 1e-9));
+});
+
+test('compassos oferecidos: 2, 3, 4, 6 e 7', () => {
+  assert.deepEqual(BEATS_PER_BAR, [2, 3, 4, 6, 7]);
+});
+
+test('compasso de 7: o acento cai só no 1º de cada 7 tempos', () => {
+  // 60 BPM = 1 clique por segundo; 15 s = dois compassos completos e o 1º tempo do terceiro
+  assert.equal(pattern(clicksFor({ beats: 7, subdivision: 1, seconds: 15 })), 'ABBBBBBABBBBBBA');
+});
+
+test('compasso de 7 com colcheias: um compasso tem 14 cliques, acento só no primeiro', () => {
+  assert.equal(pattern(clicksFor({ beats: 7, subdivision: 2, seconds: 7 })), 'AsBsBsBsBsBsBs');
 });

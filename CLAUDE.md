@@ -65,6 +65,11 @@ O que é específico de bateria está listado depois.
   O quadro do exercício também ganhou a barra deslizante de BPM do metrônomo livre (pedido do
   usuário, 2026-10-03): enquanto arrasta só mostra o número (e muda o metrônomo, se tocando); a
   velocidade é gravada uma vez só, ao soltar (`change`), porque cada gravação zera limpos/erros.
+  Compasso do metrônomo livre: 2, 3, 4, 6 e **7** (`BEATS_PER_BAR` em metronome.js; o 7 foi pedido
+  do usuário em 2026-10-05, só pra bateria — a guitarra segue com 2, 3, 4 e 6). O metrônomo já
+  contava qualquer número de tempos (`beat % beats`), então foi só incluir na lista; testado que o
+  acento cai só no 1º de cada 7 tempos, com e sem subdivisão, e verificado no navegador pelo LED de
+  batida (`ABBBBBBABBBBBBA`). A escolha fica salva (`metroBeats`).
 - `js/voice-command.js`: comando de voz pra marcar Limpo/Errei sem largar as baquetas. Cópia
   exata — "limpo"/"errei" servem igual pra bateria.
 - `js/practice-timer.js`: cronômetro por exercício. Chave própria (`drumPracticeTimer_v1`), lógica

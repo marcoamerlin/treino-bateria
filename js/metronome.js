@@ -19,6 +19,10 @@ export const SUBDIVISIONS = [
 const VALID = new Set(SUBDIVISIONS.map((s) => s.n));
 export const normalizeSubdivision = (n) => (VALID.has(Number(n)) ? Number(n) : 1);
 
+// Tempos por compasso oferecidos na tela. O 7 (pedido do usuário, 2026-10-05) é só da bateria —
+// compasso ímpar (7/4, 7/8) aparece em fill e em ritmo mais elaborado; a guitarra segue com 2, 3, 4 e 6.
+export const BEATS_PER_BAR = [2, 3, 4, 6, 7];
+
 class Metronome {
   constructor() {
     this.bpm = 90;
