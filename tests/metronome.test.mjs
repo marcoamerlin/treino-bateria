@@ -22,15 +22,18 @@ function clicksFor({ bpm = 60, beats = 4, subdivision, seconds, changes = [] }) 
 }
 const pattern = (clicks) => clicks.map((c) => c.ch).join('');
 
-test('subdivisões oferecidas: 1, 2, 3 (tercinas), 4, 6', () => {
-  assert.deepEqual(SUBDIVISIONS.map((s) => s.n), [1, 2, 3, 4, 6]);
+test('subdivisões oferecidas: 1, 2, 3 (tercinas), 4, 6, 7 (sétuplas)', () => {
+  assert.deepEqual(SUBDIVISIONS.map((s) => s.n), [1, 2, 3, 4, 6, 7]);
+  assert.equal(SUBDIVISIONS.find((s) => s.n === 7).name, 'Sétuplas');
   assert.equal(SUBDIVISIONS.find((s) => s.n === 3).name, 'Tercinas');
 });
 
 test('normalizeSubdivision aceita só valores da lista, senão volta pra 1', () => {
   assert.equal(normalizeSubdivision(3), 3);
   assert.equal(normalizeSubdivision('4'), 4);
+  assert.equal(normalizeSubdivision(7), 7);
   assert.equal(normalizeSubdivision(5), 1);
+  assert.equal(normalizeSubdivision(8), 1);
   assert.equal(normalizeSubdivision(undefined), 1);
 });
 
@@ -66,4 +69,10 @@ test('compasso de 7: o acento cai só no 1º de cada 7 tempos', () => {
 
 test('compasso de 7 com colcheias: um compasso tem 14 cliques, acento só no primeiro', () => {
   assert.equal(pattern(clicksFor({ beats: 7, subdivision: 2, seconds: 7 })), 'AsBsBsBsBsBsBs');
+});
+
+test('sétuplas: 7 cliques por tempo, igualmente espaçados, acento só no 1º clique do tempo 1', () => {
+  const clicks = clicksFor({ subdivision: 7, seconds: 2 });
+  assert.equal(pattern(clicks), 'AssssssBssssss');
+  clicks.forEach((c, i) => assert.ok(Math.abs(c.time - i / 7) < 1e-9, 'clique ' + i));
 });

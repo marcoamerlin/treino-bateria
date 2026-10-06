@@ -15,6 +15,7 @@ export const SUBDIVISIONS = [
   { n: 3, name: 'Tercinas' },
   { n: 4, name: 'Semicolcheias' },
   { n: 6, name: 'Sextinas' },
+  { n: 7, name: 'Sétuplas' }, // pedido do usuário, 2026-10-05 (só da bateria)
 ];
 const VALID = new Set(SUBDIVISIONS.map((s) => s.n));
 export const normalizeSubdivision = (n) => (VALID.has(Number(n)) ? Number(n) : 1);

@@ -54,7 +54,9 @@ O que é específico de bateria está listado depois.
 - `js/metronome.js`: metrônomo Web Audio com agendamento antecipado. Portado da guitarra, com UMA
   diferença (pedido do usuário, 2026-10-03): a subdivisão deixou de ser o liga/desliga de colcheias
   (`subdivide`) e virou `subdivision` = cliques por tempo, escolhido numa fileira "SUBDIVISÃO" na
-  tela (`SUBDIVISIONS`: 1 semínimas, 2 colcheias, 3 tercinas, 4 semicolcheias, 6 sextinas). Trocar
+  tela (`SUBDIVISIONS`: 1 semínimas, 2 colcheias, 3 tercinas, 4 semicolcheias, 6 sextinas, 7
+  sétuplas — o 7 foi o pedido "incluir 7 tempos" de 2026-10-05, só da bateria; testado com 7
+  cliques por tempo igualmente espaçados e verificado no navegador, nas duas telas). Trocar
   a subdivisão com o metrônomo tocando só vale a partir do próximo tempo (senão o tempo em curso
   misturaria duas subdivisões). Preferência `metroSubdiv`; a antiga `metroSub: true` vira 2.
   Testes em `tests/metronome.test.mjs`.
@@ -65,11 +67,13 @@ O que é específico de bateria está listado depois.
   O quadro do exercício também ganhou a barra deslizante de BPM do metrônomo livre (pedido do
   usuário, 2026-10-03): enquanto arrasta só mostra o número (e muda o metrônomo, se tocando); a
   velocidade é gravada uma vez só, ao soltar (`change`), porque cada gravação zera limpos/erros.
-  Compasso do metrônomo livre: 2, 3, 4, 6 e **7** (`BEATS_PER_BAR` em metronome.js; o 7 foi pedido
-  do usuário em 2026-10-05, só pra bateria — a guitarra segue com 2, 3, 4 e 6). O metrônomo já
-  contava qualquer número de tempos (`beat % beats`), então foi só incluir na lista; testado que o
-  acento cai só no 1º de cada 7 tempos, com e sem subdivisão, e verificado no navegador pelo LED de
-  batida (`ABBBBBBABBBBBBA`). A escolha fica salva (`metroBeats`).
+  Compasso do metrônomo livre: 2, 3, 4, 6 e 7 (`BEATS_PER_BAR` em metronome.js; a guitarra segue
+  com 2, 3, 4 e 6). Atenção ao histórico: o pedido "incluir 7 tempos" (2026-10-05) foi lido
+  primeiro como compasso de 7 tempos e o 7 entrou aqui; o usuário mandou uma captura do quadro do
+  exercício e confirmou que queria o 7 na SUBDIVISÃO (acima), não no compasso. O 7 do compasso
+  ficou (inofensivo, testado: acento só no 1º de cada 7 tempos, com e sem subdivisão, e no LED de
+  batida `ABBBBBBABBBBBBA`), a confirmar se o usuário quer manter. O metrônomo já contava qualquer
+  número de tempos (`beat % beats`). A escolha fica salva (`metroBeats`).
 - `js/voice-command.js`: comando de voz pra marcar Limpo/Errei sem largar as baquetas. Cópia
   exata — "limpo"/"errei" servem igual pra bateria.
 - `js/practice-timer.js`: cronômetro por exercício. Chave própria (`drumPracticeTimer_v1`), lógica
