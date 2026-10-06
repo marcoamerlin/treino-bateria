@@ -71,9 +71,9 @@ O que é específico de bateria está listado depois.
   com 2, 3, 4 e 6). Atenção ao histórico: o pedido "incluir 7 tempos" (2026-10-05) foi lido
   primeiro como compasso de 7 tempos e o 7 entrou aqui; o usuário mandou uma captura do quadro do
   exercício e confirmou que queria o 7 na SUBDIVISÃO (acima), não no compasso. O 7 do compasso
-  ficou (inofensivo, testado: acento só no 1º de cada 7 tempos, com e sem subdivisão, e no LED de
-  batida `ABBBBBBABBBBBBA`), a confirmar se o usuário quer manter. O metrônomo já contava qualquer
-  número de tempos (`beat % beats`). A escolha fica salva (`metroBeats`).
+  ficou por decisão do usuário (2026-10-06: "pode manter"; testado: acento só no 1º de cada 7
+  tempos, com e sem subdivisão, e no LED de batida `ABBBBBBABBBBBBA`). O metrônomo já contava
+  qualquer número de tempos (`beat % beats`). A escolha fica salva (`metroBeats`).
 - `js/voice-command.js`: comando de voz pra marcar Limpo/Errei sem largar as baquetas. Cópia
   exata — "limpo"/"errei" servem igual pra bateria.
 - `js/practice-timer.js`: cronômetro por exercício. Chave própria (`drumPracticeTimer_v1`), lógica
