@@ -6,6 +6,10 @@ sistema de professor/aluno — trocando tablatura de guitarra por baqueteamento 
 bateria. Estética de painel de amplificador (fundo escuro, LCD âmbar, switches), igual à guitarra
 — sem personagem/ilustração (pedido do usuário, 2026-09-28: "sem personagens").
 
+Pastas no notebook do usuário (Windows): este projeto fica em `C:\bateria` (repositório
+`marcoamerlin/treino-bateria`) e o Treino de Guitarra em `C:\guitarra`
+(`marcoamerlin/treino-guitarra`). Mudanças que valem pros dois apps costumam ser feitas nos dois.
+
 ## Rodar
 
 ```
