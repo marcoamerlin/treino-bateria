@@ -55,7 +55,7 @@ O que é específico de bateria está listado depois.
   diferença (pedido do usuário, 2026-10-03): a subdivisão deixou de ser o liga/desliga de colcheias
   (`subdivide`) e virou `subdivision` = cliques por tempo, escolhido numa fileira "SUBDIVISÃO" na
   tela (`SUBDIVISIONS`: 1 semínimas, 2 colcheias, 3 tercinas, 4 semicolcheias, 6 sextinas, 7
-  sétuplas — o 7 foi o pedido "incluir 7 tempos" de 2026-10-05, só da bateria; testado com 7
+  sétuplas — o 7 foi o pedido "incluir 7 tempos" de 2026-10-05, igualado na guitarra em 2026-10-07; testado com 7
   cliques por tempo igualmente espaçados e verificado no navegador, nas duas telas). Trocar
   a subdivisão com o metrônomo tocando só vale a partir do próximo tempo (senão o tempo em curso
   misturaria duas subdivisões). Preferência `metroSubdiv`; a antiga `metroSub: true` vira 2.
@@ -67,8 +67,8 @@ O que é específico de bateria está listado depois.
   O quadro do exercício também ganhou a barra deslizante de BPM do metrônomo livre (pedido do
   usuário, 2026-10-03): enquanto arrasta só mostra o número (e muda o metrônomo, se tocando); a
   velocidade é gravada uma vez só, ao soltar (`change`), porque cada gravação zera limpos/erros.
-  Compasso do metrônomo livre: 2, 3, 4, 6 e 7 (`BEATS_PER_BAR` em metronome.js; a guitarra segue
-  com 2, 3, 4 e 6). Atenção ao histórico: o pedido "incluir 7 tempos" (2026-10-05) foi lido
+  Compasso do metrônomo livre: 2, 3, 4, 6 e 7 (`BEATS_PER_BAR` em metronome.js; a guitarra tem
+  os mesmos desde 2026-10-07). Atenção ao histórico: o pedido "incluir 7 tempos" (2026-10-05) foi lido
   primeiro como compasso de 7 tempos e o 7 entrou aqui; o usuário mandou uma captura do quadro do
   exercício e confirmou que queria o 7 na SUBDIVISÃO (acima), não no compasso. O 7 do compasso
   ficou por decisão do usuário (2026-10-06: "pode manter"; testado: acento só no 1º de cada 7
