@@ -1,6 +1,7 @@
 // Interface do Treino de Bateria — estrutura idêntica à do Treino de Guitarra (mesmo padrão de
 // dia/plano/professor-aluno), trocando tablatura de guitarra por baqueteamento de bateria.
 
+import { createBackGuard } from './back-guard.js';
 import { WEEK } from './data/plans.js';
 import { RUDIMENTS, CATEGORIES } from './data/rudiments.js';
 import { buildStickingHTML } from './sticking.js';
@@ -93,13 +94,24 @@ function openSheet(node) {
   sheetBody.replaceChildren(node);
   sheet.classList.add('open');
   sheet.querySelector('.sheet').scrollTop = 0;
+  backGuard.opened();
 }
 
 function closeSheet() {
   sheet.classList.remove('open');
   sheetBody.replaceChildren();
   sheetRedrawers = [];
+  backGuard.closed();
 }
+
+// "Voltar" do Android (gesto ou botão) fecha a folha aberta em vez de sair do app.
+// Ver js/back-guard.js.
+const backGuard = createBackGuard({
+  history: window.history,
+  win: window,
+  isOpen: () => sheet.classList.contains('open'),
+  closeTop: () => closeSheet(),
+});
 
 sheet.addEventListener('click', (e) => {
   if (e.target === sheet || e.target.closest('#sheetClose')) closeSheet();
