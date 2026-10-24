@@ -2,13 +2,14 @@
 // Arquivos do app: rede primeiro (pega atualizações), cache como reserva.
 // Fontes do Google: cache na primeira visita, para aparecerem offline depois.
 
-const CACHE = 'bateria-v10';
+const CACHE = 'bateria-v11';
 const SHELL = [
   './',
   'index.html',
   'manifest.webmanifest',
   'css/style.css',
   'js/app.js',
+  'js/back-guard.js',
   'js/store.js',
   'js/sticking.js',
   'js/sticking-dsl.js',
