@@ -104,13 +104,24 @@ function closeSheet() {
   backGuard.closed();
 }
 
-// "Voltar" do Android (gesto ou botão) fecha a folha aberta em vez de sair do app.
-// Ver js/back-guard.js.
+// "Voltar" do Android (gesto ou botão) fecha o que estiver aberto em vez de sair do app: a folha
+// primeiro, depois os exercícios do dia expandidos (o último aberto primeiro). Ver js/back-guard.js.
+const sheetIsOpen = () => sheet.classList.contains('open');
+// Exercícios expandidos que aparecem no dia aberto, na ordem em que foram abertos (fechar apaga a
+// chave, então reabrir vai pro fim). Um id que saiu do plano não conta: não gasta um "voltar".
+const openCards = () => {
+  const day = WEEK.find((d) => d.key === activeKey);
+  const inPlan = new Set(currentPlan(day).map((item) => item.ex));
+  return Object.keys(openIds).filter((id) => openIds[id] && inPlan.has(id));
+};
 const backGuard = createBackGuard({
   history: window.history,
   win: window,
-  isOpen: () => sheet.classList.contains('open'),
-  closeTop: () => closeSheet(),
+  countOpen: () => Number(sheetIsOpen()) + openCards().length,
+  closeTop: () => {
+    if (sheetIsOpen()) closeSheet();
+    else { delete openIds[openCards().pop()]; render(); }
+  },
 });
 
 sheet.addEventListener('click', (e) => {
@@ -1057,7 +1068,10 @@ function exerciseCard(day, item, index, plan, log, canCheck, dateStr) {
 
   const chev = el('div', `chevron${open ? ' open' : ''}`, '▸');
   head.append(sw, meta, chev);
-  head.addEventListener('click', () => { openIds[item.ex] = !openIds[item.ex]; render(); });
+  head.addEventListener('click', () => {
+    if (openIds[item.ex]) { delete openIds[item.ex]; render(); backGuard.closed(); }
+    else { openIds[item.ex] = true; render(); backGuard.opened(); }
+  });
   card.appendChild(head);
 
   if (editing) {
@@ -1127,6 +1141,7 @@ function bankView(day, mode, index) {
         item.addEventListener('click', () => {
           closeSheet();
           openIds[id] = true;
+          backGuard.opened();
           updatePlan(day, (items) => {
             if (mode === 'swap') items[index] = { ex: id, min: ex.min };
             else items.push({ ex: id, min: ex.min });
@@ -1166,7 +1181,7 @@ function renderTabs() {
     if (day.key === activeKey) classes.push('active');
     if (day.weekday === today.getDay()) classes.push('today');
     const tab = el('button', classes.join(' '), `${day.label}<span class="dot${allDone ? ' done' : ''}"></span>`);
-    tab.addEventListener('click', () => { activeKey = day.key; openIds = {}; editing = false; render(); });
+    tab.addEventListener('click', () => { activeKey = day.key; openIds = {}; editing = false; render(); backGuard.closed(); });
     nav.appendChild(tab);
   });
 }

@@ -2,7 +2,7 @@
 // Arquivos do app: rede primeiro (pega atualizações), cache como reserva.
 // Fontes do Google: cache na primeira visita, para aparecerem offline depois.
 
-const CACHE = 'bateria-v11';
+const CACHE = 'bateria-v12';
 const SHELL = [
   './',
   'index.html',

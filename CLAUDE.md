@@ -133,9 +133,11 @@ Pendências.
   progressão temática rolos→diddles→flams→drags) + domingo de descanso. Mesma forma de
   `{key, label, name, weekday, title, focus, plan: [{ex, min}]}` da guitarra.
 - `tools/extract-snare.mjs`: extrai a amostra de Acoustic Snare do banco FluidR3_GM — ver "Som".
-- `js/back-guard.js`: o "voltar" do Android (gesto ou botão) fecha a folha aberta em vez de sair
-  do app (pedido do usuário, 2026-10-24, num Xiaomi com navegação por gestos). Mesmo módulo da
-  guitarra (ver o CLAUDE.md de lá); aqui só existe a folha, ligada em `openSheet`/`closeSheet`.
+- `js/back-guard.js`: o "voltar" do Android (gesto ou botão) fecha o que estiver aberto — a folha
+  primeiro, depois os exercícios do dia expandidos, o último aberto primeiro — em vez de sair do
+  app (pedido do usuário, 2026-10-24, num Xiaomi com navegação por gestos). Mesmo módulo da
+  guitarra (ver o CLAUDE.md de lá, que explica o mecanismo); aqui não há Braço: `countOpen()` =
+  folha + `openCards()`.
   Testes em `tests/back-guard.test.mjs`, verificado no navegador com `history.back()`.
 - `js/app.js`: interface. Reaproveita quase tudo da guitarra (utilidades, folha/sheet,
   `metronomeView`, `accountView`, toda a pilha de tela do professor/aluno, `speedBox`, `timerBox`,
